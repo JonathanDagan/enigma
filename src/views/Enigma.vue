@@ -30,7 +30,10 @@ export default defineComponent({
   },
   mounted() {
     window.addEventListener('keydown', (event) => {
-        this.handleKeyPress(event.key);
+      this.handleKeyPress(event.key);
+    });
+    window.addEventListener('keyup', (event) => {
+      this.handleKeyRelease(event.key);
     });
   },
   methods: {

@@ -36,7 +36,7 @@ export default defineComponent({
   methods: {
   handleKeyPress(key: any) { // TODO: type
     this.currentKey = key;
-    // this.$emit('keypress', key);
+    this.$emit('keypress', key);
   },
   handleKeyRelease(key: any) { // TODO: type
     this.currentKey = '';
