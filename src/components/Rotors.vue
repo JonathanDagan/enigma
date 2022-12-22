@@ -1,5 +1,12 @@
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from "vue";
 import Rotor from "../components/Rotor.vue";
+
+export default defineComponent({
+    components: {
+        Rotor,
+    },
+});
 </script>
 
 <template>

@@ -1,50 +1,68 @@
-<script setup lang="ts">
-import Key from "../components/Key.vue";
-</script>
-
 <template>
   <div class="keyboard">
     <span>
-      <Key label="Q" />
-      <Key label="W" />
-      <Key label="E" />
-      <Key label="R" />
-      <Key label="T" />
-      <Key label="Y" />
-      <Key label="U" />
-      <Key label="I" />
-      <Key label="O" />
-      <Key label="P" />
+      <button v-for="key in firstRow" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
     </span>
     <span>
-      <Key label="A" />
-      <Key label="S" />
-      <Key label="D" />
-      <Key label="F" />
-      <Key label="G" />
-      <Key label="H" />
-      <Key label="J" />
-      <Key label="K" />
-      <Key label="L" />
+      <button v-for="key in secoundRow" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
     </span>
     <span>
-      <Key label="Z" />
-      <Key label="X" />
-      <Key label="C" />
-      <Key label="V" />
-      <Key label="B" />
-      <Key label="N" />
-      <Key label="M" />
+      <button v-for="key in thirdRow" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
     </span>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'Keyboard',
+  data() {
+    return {
+      firstRow: [ 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+      secoundRow: [ 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' ],
+      thirdRow: [ 'z', 'x', 'c', 'v', 'b', 'n', 'm' ],
+      currentKey: '',
+    };
+  },
+  mounted() {
+    window.addEventListener('keydown', (event) => {
+      this.handleKeyPress(event.key);
+    });
+    window.addEventListener('keyup', (event) => {
+      this.handleKeyRelease(event.key);
+    });
+  },
+  methods: {
+  handleKeyPress(key: any) { // TODO: type
+    this.currentKey = key;
+    this.$emit('keypress', key);
+  },
+  handleKeyRelease(key: any) { // TODO: type
+    this.currentKey = '';
+  },
+},
+});
+
+</script>
+
 <style>
 .keyboard {
-  background-color: gray;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+.button {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+  background-color: #eee;
+  margin: 2px;
+}
+
+.keyboard button.pressed {
+  background-color: #ddd;
 }
 </style>

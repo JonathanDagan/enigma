@@ -1,50 +1,55 @@
-<script setup lang="ts">
-import Lamp from "../components/Lamp.vue";
-</script>
-
 <template>
     <div class="lampboard">
-        <span>
-            <Lamp label="Q" />
-            <Lamp label="W" />
-            <Lamp label="E" />
-            <Lamp label="R" />
-            <Lamp label="T" />
-            <Lamp label="Y" />
-            <Lamp label="U" />
-            <Lamp label="I" />
-            <Lamp label="O" />
-            <Lamp label="P" />
-        </span>
-        <span>
-            <Lamp label="A" />
-            <Lamp label="S" />
-            <Lamp label="D" />
-            <Lamp label="F" />
-            <Lamp label="G" />
-            <Lamp label="H" />
-            <Lamp label="J" />
-            <Lamp label="K" />
-            <Lamp label="L" />
-        </span>
-        <span>
-            <Lamp label="Z" />
-            <Lamp label="X" />
-            <Lamp label="C" />
-            <Lamp label="V" />
-            <Lamp label="B" />
-            <Lamp label="N" />
-            <Lamp label="M" />
-        </span>
+      <span>
+        <button v-for="key in firstRow" :class="{ 'pressed': currentKey === key }">{{ key.toUpperCase() }}</button>
+      </span>
+      <span>
+        <button v-for="key in secoundRow" :class="{ 'pressed': currentKey === key }">{{ key.toUpperCase() }}</button>
+      </span>
+      <span>
+        <button v-for="key in thirdRow" :class="{ 'pressed': currentKey === key }">{{ key.toUpperCase() }}</button>
+      </span>
     </div>
-</template>
-
-<style>
-.lampboard {
-    background-color: gray;
+  </template>
+  
+  <script lang="ts">
+  import { defineComponent } from 'vue'
+  export default defineComponent({
+    name: 'Lampboard',
+    props: {
+        currentKey: {
+            type: String,
+            required: true,
+        },
+    },
+    data() {
+      return {
+        firstRow: [ 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+        secoundRow: [ 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' ],
+        thirdRow: [ 'z', 'x', 'c', 'v', 'b', 'n', 'm' ],
+      };
+    },
+  });
+  
+  </script>
+  
+  <style>
+  .lampboard {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-}
-</style>
+  }
+  .button {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+    background-color: #eee;
+    margin: 2px;
+  }
+  .lampboard button.pressed {
+    background-color: rgb(184, 175, 44);
+  }
+  </style>
+  

@@ -1,6 +1,15 @@
-<script setup lang="ts">
+<script lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+
+export default {
+  name: 'App',
+  components: {
+    HelloWorld,
+    RouterLink,
+    RouterView,
+  },
+}
 </script>
 
 <template>
@@ -13,7 +22,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/test">Test</RouterLink>
+        <RouterLink to="/enigma">Enigma</RouterLink>
       </nav>
     </div>
   </header>
