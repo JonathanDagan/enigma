@@ -35,7 +35,12 @@ export default defineComponent({
   },
   methods: {
     handleKeyPress(key: any) { // TODO: type
-      console.log(`Key pressed: ${key}`);
+      // console.log(`Key pressed: ${key}`);
+      this.currentKey = key;
+    },
+    handleKeyRelease(key: any) { // TODO: type
+      // console.log(`Key pressed: ${key}`);
+      this.currentKey = '';
     },
   },
 })
