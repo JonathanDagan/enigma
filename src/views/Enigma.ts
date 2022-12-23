@@ -1,51 +1,60 @@
+
 export class Enigma {
     private static readonly ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
     private static readonly ALPHABET_LENGTH = Enigma.ALPHABET.length;
-    
-    private static readonly ROTORS = [
-        {
-        wiring: 'abcdefghijklmnopqrstuvwxyz',
-        notch: 'a'
-        },
-        {
-        wiring: 'abcdefghijklmnopqrstuvwxyz',
-        notch: 'a'
-        },
-        {
-        wiring: 'abcdefghijklmnopqrstuvwxyz',
-        notch: 'a'
-        },
-    ];
 
-    private static readonly REFLECTOR = {
-        wiring: 'yruhqsldpxngokmiebfzcwvjat'
-    };
+    public plugboard: Pluboard = new Pluboard();
+    public rotors: Rotors = new Rotors();
+    private _reflector: reflectorMapping = defaultreflector;
 
-    private static readonly PLUGBOARD = {
-        wiring: 'abcdefghijklmnopqrstuvwxyz'
-    };
-
-    private static shiftRotor(rotor: any, shift: number): any {
-        const shiftedRotor = {
-            wiring: '',
-            notch: rotor.notch
-        };
-
-        for (let i = 0; i < Enigma.ALPHABET_LENGTH; i++) {
-            const shiftedIndex = (i + shift) % Enigma.ALPHABET_LENGTH;
-            shiftedRotor.wiring += rotor.wiring[shiftedIndex];
-        }
-
-        return shiftedRotor;
+    // create a method that takes a letter and returns the matching letter from the plugboard
+    // check if the letter is plugged to another letter, return the other letter otherwise return the letter
+    private _passThroughPlugboard(letter: string): string {
+        const pluggedPair = this.plugboard.pluggedPairs.filter((pair) => {
+            if (pair.includes(letter)) {
+                return pair;
+            }
+        });
+        // TODO: i was here :)
+        return pluggedPair.length > 0 ? pluggedPair[0].replace(letter, '') : letter;
     }
-    
+    // TODO: have the value change by order of the rotors in list
+    private _passThroughRotors(letter: string, direction: 'in' | 'out'): string {
+        let value = letter;
+        if (direction === 'in') {
+            value = this.rotors.rotor1.mapping[value];
+            value = this.rotors.rotor2.mapping[value];
+            value = this.rotors.rotor3.mapping[value];
+        } else {
+            value = this.rotors.rotor3.mapping[value];
+            value = this.rotors.rotor2.mapping[value];
+            value = this.rotors.rotor1.mapping[value];
+        }
+        return value;
 
-    public static encrypt(message: string): string {
-        return 'a';
+    }
+
+    private _passThroughReflector(letter: string): string {
+        return this._reflector[letter];
+    }
+
+
+    public encrypt(message: string): string {
+        let value = message[0];
+
+        value = this._passThroughPlugboard(value);
+        value = this._passThroughRotors(value, 'in');
+        value = this._passThroughReflector(value);
+        value = this._passThroughRotors(value, 'out');
+        
+        this.rotors.step();
+        return value;
     }
 }
+const enigma = new Enigma();
+enigma.encrypt('aaa');
 
-const defaultRotor = {
+const defaultRotorMapping: rottorMapping = {
     'a': 'b',
     'b': 'c',
     'c': 'd',
@@ -74,16 +83,62 @@ const defaultRotor = {
     'z': 'a'
 }
 
+const defaultreflector: reflectorMapping = {
+    'a': 'z',
+    'b': 'y',
+    'c': 'x',
+    'd': 'w',
+    'e': 'v',
+    'f': 'u',
+    'g': 't',
+    'h': 's',
+    'i': 'r',
+    'j': 'q',
+    'k': 'p',
+    'l': 'o',
+    'm': 'n',
+    'n': 'm',
+    'o': 'l',
+    'p': 'k',
+    'q': 'j',
+    'r': 'i',
+    's': 'h',
+    't': 'g',
+    'u': 'f',
+    'v': 'e',
+    'w': 'd',
+    'x': 'c',
+    'y': 'b',
+    'z': 'a'
+}
+
+interface rotor {
+    notch: string;
+    mapping: rottorMapping;
+}
+
+interface rottorMapping {
+    [key: string]: string;
+}
+
+interface reflectorMapping {
+    [key: string]: string;
+}
+
 class Rotor {
-    private mapping: {[key: string]: string} = {};
-    private _notch = 'a';
-    constructor(notch: string, mapping: {[key: string]: string} = defaultRotor) {
+    private _mapping: {[key: string]: string};
+    private _notch: string;
+    constructor(notch: string = 'a', mapping: rottorMapping = defaultRotorMapping) {
         this._notch = notch;
-        this.mapping = mapping;
+        this._mapping = mapping;
     }
 
     public get notch(): string {
         return this._notch;
+    }
+
+    public get mapping(): rottorMapping {
+        return this._mapping;
     }
 
     public step(): void {
@@ -101,10 +156,10 @@ class Rotors {
     public readonly rotor2: Rotor;
     public readonly rotor3: Rotor;
 
-    constructor() {
-        this.rotor1 = new Rotor('a');
-        this.rotor2 = new Rotor('a');
-        this.rotor3 = new Rotor('a');
+    constructor(rotor1: Rotor = new Rotor(), rotor2: Rotor = new Rotor, rotor3: Rotor = new Rotor) {
+        this.rotor1 = rotor1
+        this.rotor2 = rotor2
+        this.rotor3 = rotor3
     }
 
     public step(): void {
@@ -119,25 +174,32 @@ class Rotors {
 }
 
 class Pluboard {
-    public static pluggedPairs: string[] = [];
-
-    // create plug and unplug methods which dont let you plug the same letter twice
-    public static plug(letter1: string, letter2: string): void {
-        if (this.isPlugged(letter1, letter2)) {
-            // raise error
-            throw new AlreadyPluggedError('Letters are already plugged');
-        }
-        this.pluggedPairs.push(letter1 + letter2);
+    private _pluggedPairs: string[] = [];
+    // create a plug method that only allows a pair to be plugged if both letters are not already plugged
+    // create an unplug method that removes a pair from the pluggedPairs array 
+    // create an isPlugged method that returns true if a letter is plugged to another letter   
+    
+    public get pluggedPairs(): string[] {
+        return this._pluggedPairs;
     }
 
-    public static unplug(letter1: string, letter2: string): void {
-        this.pluggedPairs = this.pluggedPairs.filter((pair) => {
-            return pair !== letter1 + letter2;
+    public plug(letter1: string, letter2: string): void {
+        if (this.isPlugged(letter1) || this.isPlugged(letter2)) {
+            throw new AlreadyPluggedError(`${letter1} or ${letter2} is already plugged`);
+        }
+        this._pluggedPairs.push(letter1 + letter2);
+    }
+
+    public unplug(letter1: string, letter2: string): void {
+        this._pluggedPairs = this._pluggedPairs.filter((pair) => {
+            return !pair.includes(letter1) && !pair.includes(letter2);
         });
     }
 
-    public static isPlugged(letter1: string, letter2: string): boolean {
-        return this.pluggedPairs.includes(letter1 + letter2);
+    public isPlugged(letter:string): boolean {
+        return this._pluggedPairs.some((pair) => {
+            return pair.includes(letter);
+        });
     }
 
 }
