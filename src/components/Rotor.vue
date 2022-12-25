@@ -1,9 +1,10 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-interface rottorMapping {
+export interface rottorMapping {
     [key: string]: string;
 }
+const alphabet = 'abcdefghijklmnopqrstuvwxyz';
 
 const defaultRotorMapping: rottorMapping = {
     'a': 'b',
@@ -50,12 +51,12 @@ export default defineComponent({
         return {
             notch: 'a',
             mapping: this.mapping,
+            alphabet: alphabet,
         };
     },
     methods: {
-        stepThroughAlphabet(direction: 'forward' | 'backward' = 'forward'): void {
-            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-            let currentIndex = alphabet.indexOf(this.notch);            
+        step(direction: 'forward' | 'backward' = 'forward'): void {
+            let currentIndex = this.alphabet.indexOf(this.notch);            
             if (direction === 'forward') {
                 currentIndex += 1;
                 if (currentIndex > 25) {
@@ -67,10 +68,10 @@ export default defineComponent({
                     currentIndex = 25;
                 }
             }
-            this.notch = alphabet[currentIndex];
+            this.notch = this.alphabet[currentIndex]; //TODO: need to fix this
         },
-        shift() {
-            return this.mapping[this.notch];
+        shift(letter: string): string {
+            return this.mapping[letter];
         }
     }
 });
@@ -79,9 +80,9 @@ export default defineComponent({
 
 <template>
     <div class="rotor">
-        <button @click="stepThroughAlphabet('forward')">+</button>
+        <button @click="step('forward')">+</button>
         <div>{{ notch }}</div>
-        <button @click="stepThroughAlphabet('backward')">-</button>
+        <button @click="step('backward')">-</button>
     </div>
 </template>
 
