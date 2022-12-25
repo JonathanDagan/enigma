@@ -1,58 +1,45 @@
-
 export class Enigma {
-    private static readonly ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
-    private static readonly ALPHABET_LENGTH = Enigma.ALPHABET.length;
 
     public plugboard: Pluboard = new Pluboard();
     public rotors: Rotors = new Rotors();
     private _reflector: reflectorMapping = defaultreflector;
 
-    // create a method that takes a letter and returns the matching letter from the plugboard
-    // check if the letter is plugged to another letter, return the other letter otherwise return the letter
-    private _passThroughPlugboard(letter: string): string {
-        const pluggedPair = this.plugboard.pluggedPairs.filter((pair) => {
-            if (pair.includes(letter)) {
-                return pair;
-            }
-        });
-        // TODO: i was here :)
-        return pluggedPair.length > 0 ? pluggedPair[0].replace(letter, '') : letter;
+    public encrypt(letter: string): string {
+        if (!/^[a-zA-Z]$/.test(letter)) {
+            throw new Error('Expected one alphabetical character');
+        }
+
+        letter = this._passThroughPlugboard(letter);
+        letter = this._passThroughRotors(letter, 'in');
+        letter = this._passThroughReflector(letter);
+        letter = this._passThroughRotors(letter, 'out');
+        
+        this.rotors.step();
+        return letter;
     }
-    // TODO: have the value change by order of the rotors in list
+
+    private _passThroughPlugboard(letter: string): string {
+        const pairs = this.plugboard.pluggedPairs;
+        const pair = pairs.find(([letter1, letter2]) => letter1 === letter || letter2 === letter);
+        return pair ? (pair[0] === letter ? pair[1] : pair[0]) : letter;
+    }
+
     private _passThroughRotors(letter: string, direction: 'in' | 'out'): string {
         let value = letter;
-        if (direction === 'in') {
-            value = this.rotors.rotor1.mapping[value];
-            value = this.rotors.rotor2.mapping[value];
-            value = this.rotors.rotor3.mapping[value];
-        } else {
-            value = this.rotors.rotor3.mapping[value];
-            value = this.rotors.rotor2.mapping[value];
-            value = this.rotors.rotor1.mapping[value];
-        }
+        let rotors = [this.rotors.rotor1, this.rotors.rotor2, this.rotors.rotor3];
+        rotors = direction === 'in' ? rotors : rotors.reverse();
+        
+        rotors.forEach((rotor) => {
+            value = rotor.mapping[value];
+        });
         return value;
-
     }
 
     private _passThroughReflector(letter: string): string {
         return this._reflector[letter];
     }
-
-
-    public encrypt(message: string): string {
-        let value = message[0];
-
-        value = this._passThroughPlugboard(value);
-        value = this._passThroughRotors(value, 'in');
-        value = this._passThroughReflector(value);
-        value = this._passThroughRotors(value, 'out');
-        
-        this.rotors.step();
-        return value;
-    }
 }
-const enigma = new Enigma();
-enigma.encrypt('aaa');
+
 
 const defaultRotorMapping: rottorMapping = {
     'a': 'b',
@@ -184,6 +171,7 @@ class Pluboard {
     }
 
     public plug(letter1: string, letter2: string): void {
+        // TODO: make sure both values are letters
         if (this.isPlugged(letter1) || this.isPlugged(letter2)) {
             throw new AlreadyPluggedError(`${letter1} or ${letter2} is already plugged`);
         }
@@ -203,6 +191,7 @@ class Pluboard {
     }
 
 }
+
 class AlreadyPluggedError extends Error {
     constructor(message: string) {
         super(message);
