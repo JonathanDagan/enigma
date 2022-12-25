@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import Vue, { defineComponent, ref } from "vue";
 import Rotor from "../components/Rotor.vue";
 
 interface reflectorMapping {
@@ -55,18 +55,15 @@ export default defineComponent({
     data() {
         return {
             reflector: new Reflector(),
-            rotor1: this.$refs.rotor1 as typeof Rotor[],
-            rotor2: this.$refs.rotor2 as typeof Rotor[],
-            rotor3: this.$refs.rotor3 as typeof Rotor[],
-            rotors: [
-                //@ts-ignore //TODO: fix this warning withouth ts-ignore
-                ...this.$refs.rotors.$children as typeof Rotor[],
-            ] as typeof Rotor[],
+            rotors: ref<typeof Rotor[]>([]),
         };
+    },
+    mounted() {
+        this.rotors = this.$refs.$children as typeof Rotor[];
     },
     methods: {
         step(rotor: typeof Rotor) {
-            rotor.step('forward')
+            this.rotors[0].step('forward');
             rotor.notch = (rotor.notch) % rotor.alphabet.length;
             const rotorIndex = this.rotors.findIndex(rotor => rotor === rotor);
             if (rotor.notch === 'z' && this.rotors[rotorIndex + 1] !== undefined) {
