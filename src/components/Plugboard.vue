@@ -1,17 +1,18 @@
 <template>
-    <div class="plugboard">
-        <span class="plug-row" v-for="row in rows">
-            <div class="plug" v-for="key in row">
-                <label for="key">{{key}}</label>
-                <input type="radio" :value="key" />
-            </div>
-        </span>
-        <button>plug</button>
-    </div>
+    <form class="plugboard" @submit.prevent="submitForm"></form>
+    <span class="plug-row" v-for="row in rows">
+        <label class="plug" v-for="key in row" for="key">{{ key.toUpperCase() }}
+            <input type="checkbox" v-model="selectedPlugs" :disabled="selectedPlugs.length >= 2 && !selectedPlugs.includes(key)" :value="key" />
+        </label>
+    </span>
+    <button type="submit" :disabled="selectedPlugs.length !== 2">Plug</button>
 </template>
   
 <script lang="ts">
 import { defineComponent } from 'vue'
+
+const BASIC_COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+
 export default defineComponent({
     name: 'Plugboard',
     data() {
@@ -20,9 +21,20 @@ export default defineComponent({
                 ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
                 ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
                 ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-            ]
+            ],
+            selectedPlugs: [] as string[],
         };
     },
+    computed: {
+        selectedPlugValues() {
+            return this.selectedPlugs.slice(0, 2);
+        }
+    },
+    methods: {
+        submitForm() {
+            console.log(this.selectedPlugs);
+        }
+    }
 });
 
 </script>
@@ -48,7 +60,7 @@ export default defineComponent({
     background-color: rgb(184, 175, 44);
 }
 
-.plug {
+.label {
     display: flex;
     align-items: center;
     justify-content: center;
