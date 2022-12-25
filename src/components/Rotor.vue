@@ -1,4 +1,5 @@
 <script lang="ts">
+import { defineComponent } from "vue";
 
 interface rottorMapping {
     [key: string]: string;
@@ -32,7 +33,7 @@ const defaultRotorMapping: rottorMapping = {
     'y': 'z',
     'z': 'a'
 }
-export default {
+export default defineComponent({
     props: {
         notch: {
             type: String,
@@ -47,14 +48,14 @@ export default {
     },
     data() {
         return {
-            notch: this.notch,
+            notch: 'a',
             mapping: this.mapping,
         };
     },
     methods: {
-        stepThroughAlphabet(direction: 'forward' | 'backward' = 'forward'): string {
+        stepThroughAlphabet(direction: 'forward' | 'backward' = 'forward'): void {
             const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-            let currentIndex = alphabet.indexOf(this.notch);
+            let currentIndex = alphabet.indexOf(this.notch);            
             if (direction === 'forward') {
                 currentIndex += 1;
                 if (currentIndex > 25) {
@@ -66,19 +67,19 @@ export default {
                     currentIndex = 25;
                 }
             }
-            return alphabet[currentIndex];
+            this.notch = alphabet[currentIndex];
         },
         shift() {
             return this.mapping[this.notch];
         }
     }
-}
+});
 
 </script>
 
 <template>
     <div class="rotor">
-        <button @click="stepThroughAlphabet('backward')">+</button>
+        <button @click="stepThroughAlphabet('forward')">+</button>
         <div>{{ notch }}</div>
         <button @click="stepThroughAlphabet('backward')">-</button>
     </div>

@@ -7,6 +7,8 @@
             <Lampboard :current-key="currentKey" />
             <br>
             <Keyboard v-on:keypress="handleKeyPress" />
+            <br>
+            <PlugBoard />
         </div>
     </div>
 </template>
@@ -15,6 +17,7 @@
 import Rotors from "../components/Rotors.vue";
 import Lampboard from "../components/Lampboard.vue";
 import Keyboard from "../components/Keyboard.vue";
+import PlugBoard from "../components/Plugboard.vue";
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -27,6 +30,7 @@ export default defineComponent({
     Rotors,
     Lampboard,
     Keyboard,
+    PlugBoard,
   },
   mounted() {
     window.addEventListener('keydown', (event) => {
