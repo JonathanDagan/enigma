@@ -1,13 +1,7 @@
 <template>
   <div class="keyboard">
-    <span>
-      <button v-for="key in firstRow" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
-    </span>
-    <span>
-      <button v-for="key in secoundRow" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
-    </span>
-    <span>
-      <button v-for="key in thirdRow" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
+    <span v-for="row in rows">
+      <button v-for="key in row" :class="{ 'pressed': currentKey === key }" @click="handleKeyPress(key)">{{ key.toUpperCase() }}</button>
     </span>
   </div>
 </template>
@@ -19,9 +13,11 @@ export default defineComponent({
   name: 'Keyboard',
   data() {
     return {
-      firstRow: [ 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-      secoundRow: [ 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' ],
-      thirdRow: [ 'z', 'x', 'c', 'v', 'b', 'n', 'm' ],
+      rows: [
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+            ],
       currentKey: '',
     };
   },
