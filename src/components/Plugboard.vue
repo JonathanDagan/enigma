@@ -1,11 +1,14 @@
 <template>
-    <form class="plugboard" @submit.prevent="submitForm"></form>
+    <form class="plugboard" @submit.prevent="plug"></form>
     <span class="plug-row" v-for="row in rows">
         <label class="plug" v-for="key in row" for="key">{{ key.toUpperCase() }}
-            <input type="checkbox" v-model="selectedPlugs" :disabled="selectedPlugs.length >= 2 && !selectedPlugs.includes(key)" :value="key" />
+            <input type="checkbox" v-model="selectedPlugs"
+                :disabled="(selectedPlugs.length >= 2 && !selectedPlugs.includes(key)) || isPlugged(key)"
+                :value="key" />
         </label>
     </span>
-    <button type="submit" :disabled="selectedPlugs.length !== 2">Plug</button>
+    <button type="submit" :disabled="selectedPlugs.length !== 2" @click="plug">Plug</button>
+    <button type="submit" :disabled="!plugedPairs.length" @click="unplug">Unplug</button>
 </template>
   
 <script lang="ts">
@@ -23,6 +26,7 @@ export default defineComponent({
                 ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
             ],
             selectedPlugs: [] as string[],
+            plugedPairs: [] as string[][],
         };
     },
     computed: {
@@ -31,10 +35,19 @@ export default defineComponent({
         }
     },
     methods: {
-        submitForm() {
-            console.log(this.selectedPlugs);
-        }
-    }
+        isPlugged(letter: string): boolean {
+            return this.plugedPairs.some((pair) => {
+                return pair.includes(letter);
+            })
+        },
+        plug() {
+            this.plugedPairs.push([...this.selectedPlugValues]);
+            this.selectedPlugs = [];
+        },
+        unplug() {
+            this.plugedPairs = [];
+        },
+    },
 });
 
 </script>
