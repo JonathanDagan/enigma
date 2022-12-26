@@ -82,6 +82,13 @@ export default defineComponent({
             });
             return value;
         },
+        passThroughAll(letter: string) :void{
+            let value = letter;
+            value = this.passThroughRotors(value, 'in');
+            value = this.reflector.passThroughReflector(value);
+            value = this.passThroughRotors(value, 'out');
+            this.$emit('rotors', value);
+        },
     }
 });
 </script>
